@@ -1,0 +1,136 @@
+INSERT SP 
+
+USE [StudentDB]
+GO
+/****** Object:  StoredProcedure [dbo].[InsertStudentSP]    Script Date: 2/27/2024 7:54:57 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[InsertStudentSP]
+    @Name NVARCHAR(100) = NULL,
+    @ContactNumber VARCHAR(20) = NULL,
+    @Age INT = NULL,
+    @Message NVARCHAR(200) OUTPUT 
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF (ISNULL(@Name,'') = '')
+    BEGIN
+        SET @Message = 'Please Enter Name.';
+        RETURN;
+    END
+    
+    IF NOT EXISTS (SELECT 1 FROM Students WHERE Name = @Name)
+    BEGIN
+        INSERT INTO Students (Name, ContactNumber, Age)
+        VALUES (@Name, @ContactNumber, @Age)
+        SET @Message = 'Record Added Successfully.';
+    END
+    ELSE
+        SET @Message = 'Record Already Exists.';
+END
+
+
+
+
+
+-----------****************-------------****************-------------****************------
+UPDATE SP 
+
+USE [StudentDB]
+GO
+/****** Object:  StoredProcedure [dbo].[UpdateStudentSP]    Script Date: 2/27/2024 7:55:05 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER PROCEDURE [dbo].[UpdateStudentSP]
+	@Id INT =NULL,
+    @Name NVARCHAR(100) = NULL,
+    @ContactNumber VARCHAR(20) = NULL,
+    @Age INT = NULL,
+    @Message NVARCHAR(200) OUTPUT 
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF (ISNULL(@Name,'') = '')
+    BEGIN
+        SET @Message = 'Please Enter Name.';
+        RETURN;
+    END
+    
+    IF NOT EXISTS (SELECT 1 FROM Students WHERE Name = @Name AND Id<>@Id)
+    BEGIN
+       
+	 UPDATE Students SET 
+        Name = @Name,
+        ContactNumber = @ContactNumber,
+        Age = @Age
+    WHERE
+        Id = @Id;
+    SET @Message = 'Student record updated successfully.';        
+    END
+    ELSE
+        SET @Message = 'Record Already Exists.';
+END
+
+
+------------****************-------------****************-------------****************------
+GET STUDENTs DATA
+
+USE [StudentDB]
+GO
+/****** Object:  StoredProcedure [dbo].[GetStudentsSP]    Script Date: 2/27/2024 7:55:12 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[GetStudentsSP]
+AS
+BEGIN
+    SET NOCOUNT ON;	
+	SELECT
+	(
+		Select * from Students
+		FOR JSON AUTO
+	)
+END
+
+
+------------****************-------------****************-------------****************-----
+
+DELETE STUDENT
+
+USE [StudentDB]
+GO
+/****** Object:  StoredProcedure [dbo].[DeleteStudentsSP]    Script Date: 2/27/2024 7:55:17 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[DeleteStudentsSP]
+
+    @Id INT = NULL,
+    @Message NVARCHAR(200) OUTPUT 
+AS
+BEGIN
+	SET NOCOUNT ON;
+	IF EXISTS(SELECT 1 FROM  Students WHERE Id=@Id)
+	BEGIN		
+		DELETE FROM  Students  WHERE Id = @Id	
+		SELECT @Message='Record Deleted Successfully.'
+	END
+	ELSE
+	BEGIN
+		SELECT @Message='Record Not Present.'
+	END
+END
+
+
+
+
+
